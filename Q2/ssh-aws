@@ -6,5 +6,5 @@ if [ $(ip_from_instance "$1")  == null ];
 then
     echo "Host not found";
 else
-    ssh -i ~/.ssh/aws.pem ec2-user@$(ip_from_instance "$1")
+    ssh ec2-user@$(ip_from_instance "$1")
 fi
