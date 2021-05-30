@@ -1,0 +1,1 @@
+echo "Total number of HTTP requests is $(wc -l access.log | awk '{print $1;}')"

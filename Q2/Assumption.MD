@@ -1,0 +1,3 @@
+- AWS-cli 'aws' is available;
+- aws is already configured (~/.aws)
+- ssh pem key is ~/.ssh/aws.pem

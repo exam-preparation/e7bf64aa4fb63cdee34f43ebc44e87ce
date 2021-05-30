@@ -1,0 +1,14 @@
+function hostname_from_instance() {
+    echo $(aws ec2 describe-instances --filters "{\"Name\":\"tag:Name\", \"Values\":[\"$1\"]}" --query='Reservations[0].Instances[0].PublicDnsName' | tr -d '"')
+}
+
+function ip_from_instance() {
+    echo $(aws ec2 describe-instances --filters "{\"Name\":\"tag:Name\", \"Values\":[\"$1\"]}" --query='Reservations[0].Instances[0].PublicIpAddress' | tr -d '"')
+}
+
+if [ $(ip_from_instance "$1")  == null ];
+then
+    echo "Host not found";
+else
+    ssh -i ~/.ssh/aws.pem root@$(ip_from_instance "$1")
+fi
