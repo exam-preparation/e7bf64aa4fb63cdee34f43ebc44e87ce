@@ -1,5 +1,5 @@
 # Q1
-Please run 
+Please navigate into Q1 folder and run 
 ```bash
 ./Q1-1-total-number-of-http-requests.sh
 ./Q1-2-top-10-most-requests.sh
@@ -21,7 +21,7 @@ Assumptions:
 - ssh pem key is already added
 - target aws ec2 is allowed to connect from the host machine
 
-Please run
+Please navigate into Q2 folder and run
 ```bash
 ./ssh-aws "[The ec2 name]"
 ```

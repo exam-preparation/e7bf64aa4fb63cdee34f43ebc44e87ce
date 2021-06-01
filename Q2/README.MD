@@ -5,7 +5,7 @@ Assumptions:
 - ssh pem key is already added
 - target aws ec2 is allowed to connect from the host machine
 
-Please run
+Please navigate into Q2 folder and run
 ```bash
 ./ssh-aws "[The ec2 name]"
 ```
