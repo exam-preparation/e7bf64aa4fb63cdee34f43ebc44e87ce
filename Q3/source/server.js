@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const { MongoClient } = require('mongodb')
+const morgan = require('morgan')
 
 const {
   DB_USER,
@@ -9,7 +10,8 @@ const {
   DB_PORT,
   DB_DATABASE,
   DOMAIN,
-  PROTOCOL
+  PROTOCOL,
+  PORT
 } = process.env
 
 const charString =
@@ -23,25 +25,28 @@ function ran() {
     .join('')
 }
 
-async function genHash({ url, db }) {
+async function genHash({ _id, db }) {
   try {
     let hash = ran()
     while (await db.collection('shorten_url_mapping').findOne({ hash })) {
       hash = ran()
     }
-
-    await db.collection('shorten_url_mapping').insertOne({ url, hash })
+    try {
+      await db.collection('shorten_url_mapping').insertOne({ _id, hash })
+    } catch (err) {
+      hash = await db.collection('shorten_url_mapping').findOne({ _id })
+    }
     return hash
   } catch (err) {
-    console.error('Hash error!!', url)
+    console.error('Hash error!!', _id)
   }
 }
 
 ;(async () => {
   // Connection URL
-  const url = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}`
+  const mongoConnectionString = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}`
   // Database Name
-  const client = new MongoClient(url, {
+  const client = new MongoClient(mongoConnectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
@@ -50,34 +55,35 @@ async function genHash({ url, db }) {
     await client.connect()
     const db = client.db(DB_DATABASE)
 
+    app.use(morgan('combined'))
     app.use(express.json())
 
-    app.post('/newurl', async ({ body: { url } }, res) => {
+    app.post('/newurl', async ({ body: { url: _id } }, res) => {
       try {
         const { hash } =
-          (await db.collection('shorten_url_mapping').findOne({ url })) ?? {}
+          (await db.collection('shorten_url_mapping').findOne({ _id })) ?? {}
 
         const shortenUrl = `${PROTOCOL}://${DOMAIN}/${
-          hash ?? (await genHash({ url, db }))
+          hash ?? (await genHash({ _id, db }))
         }`
 
-        return res.json({ url, shortenUrl })
+        return res.json({ url: _id, shortenUrl })
       } catch (err) {
         console.error(err)
       }
     })
 
     app.get('/:hash([a-zA-Z0-9]{9})', async ({ params: { hash } }, res) => {
-      const { url } =
+      const { _id: url } =
         (await db.collection('shorten_url_mapping').findOne({ hash })) || {}
       return url
         ? res.status(304).redirect(url)
         : res.status(400).send('Location does not exist.')
     })
 
-    app.listen(80, () => {
+    app.listen(PORT, () => {
       console.log(
-        `Q3 URL shortener service is listening at ${PROTOCOL}://${DOMAIN}/`
+        `Q3 URL shortener service is listening at ${PROTOCOL}://${DOMAIN}:${PORT}/`
       )
     })
   } catch (err) {

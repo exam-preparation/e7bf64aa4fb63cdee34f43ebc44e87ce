@@ -8,7 +8,7 @@ services:
       - -c
       - |
         npm i;
-        tail -f /dev/null
+        npm start
     volumes:
       - ./Q3/source:/root/source
       - /root/source/node_modules
@@ -23,6 +23,7 @@ services:
       - DB_DATABASE=Q3
       - DOMAIN=localhost
       - PROTOCOL=http
+      - PORT=80
     restart: unless-stopped
   mongo:
     image: mongo
@@ -33,5 +34,5 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=example
       - MONGO_INITDB_DATABASE=Q3
-    ports:
-      - 3717:27017
+    # ports:
+    #   - 3717:27017
