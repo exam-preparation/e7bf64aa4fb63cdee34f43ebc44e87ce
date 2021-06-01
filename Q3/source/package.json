@@ -1,0 +1,16 @@
+{
+  "name": "q3",
+  "version": "1.0.0",
+  "description": "ShortenLink",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongodb": "^3.6.9",
+    "murmurhash": "^2.0.0"
+  }
+}

@@ -1,0 +1,37 @@
+version: '3'
+services:
+  app:
+    image: node
+    working_dir: /root/source
+    entrypoint:
+      - sh
+      - -c
+      - |
+        npm i;
+        tail -f /dev/null
+    volumes:
+      - ./Q3/source:/root/source
+      - /root/source/node_modules
+    ports:
+      - '80:80'
+    environment:
+      - TZ=Asia/Hong_Kong
+      - DB_USER=root
+      - DB_PASSWORD=example
+      - DB_HOST=mongo
+      - DB_PORT=27017
+      - DB_DATABASE=Q3
+      - DOMAIN=localhost
+      - PROTOCOL=http
+    restart: unless-stopped
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - /data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+      - MONGO_INITDB_DATABASE=Q3
+    ports:
+      - 3717:27017
