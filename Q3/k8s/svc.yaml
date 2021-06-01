@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shortenurl-${CI_COMMIT_REF_SLUG}
+  namespace: default
+spec:
+  ports:
+  - name: public-api
+    port: 80
+    targetPort: 80
+  selector:
+    app: shortenurl-${CI_COMMIT_REF_SLUG}

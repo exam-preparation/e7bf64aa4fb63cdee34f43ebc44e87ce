@@ -55,6 +55,9 @@ async function genHash({ _id, db }) {
     await client.connect()
     const db = client.db(DB_DATABASE)
 
+    app.set('trust proxy', true)
+    app.get('/healthz', async (req, res) => res.send('ok'))
+    app.get('/version', async (req, res) => res.send(COMMIT))
     app.use(morgan('combined'))
     app.use(express.json())
 

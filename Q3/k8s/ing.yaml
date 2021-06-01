@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: shortenurl-${CI_COMMIT_REF_SLUG}
+  namespace: default
+spec:
+  tls:
+  - hosts:
+    - ${URL}
+    secretName: tls-shortenurl
+  rules:
+  - host: ${URL}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: shortenurl-${CI_COMMIT_REF_SLUG}
+          servicePort: 80

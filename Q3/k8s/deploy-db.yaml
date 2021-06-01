@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shortenurl-db-${CI_COMMIT_REF_SLUG}
+  namespace: default
+  annotations:
+    app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+    app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+spec:
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: shortenurl-db-${CI_COMMIT_REF_SLUG}
+  template:
+    metadata:
+      labels:
+        app: shortenurl-db-${CI_COMMIT_REF_SLUG}
+      annotations:
+        app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+        app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+    spec:
+      containers:
+      - name: mongo
+        image: mongo
+        ports:
+        - containerPort: 27017
+        envFrom:
+        - configMapRef:
+            name: ${CONFIGMAP_NAME}-db
+          requests:
+            cpu: 250m
+            memory: 500Mi

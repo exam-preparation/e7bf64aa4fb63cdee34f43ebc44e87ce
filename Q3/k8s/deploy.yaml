@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shortenurl-${CI_COMMIT_REF_SLUG}
+  namespace: default
+  annotations:
+    app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+    app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+spec:
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: shortenurl-${CI_COMMIT_REF_SLUG}
+  template:
+    metadata:
+      labels:
+        app: shortenurl-${CI_COMMIT_REF_SLUG}
+      annotations:
+        app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+        app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+    spec:
+      imagePullSecrets:
+      - name: private-auth
+      containers:
+      - name: shortenurl
+        image: ${CONTAINER_IMAGE}
+        ports:
+        - containerPort: 80
+        envFrom:
+        - secretRef:
+            name: shortenurl
+        - configMapRef:
+            name: ${CONFIGMAP_NAME}-app
+        env:
+        - name: COMMIT
+          value: "${CI_COMMIT_SHA}"
+        - name: ENV
+          value: "${CI_COMMIT_REF_SLUG}"
+        readinessProbe:
+          httpGet:
+            port: 80
+            path: /healthz
+          initialDelaySeconds: 5
+          periodSeconds: 60
+        livenessProbe:
+          httpGet:
+            port: 80
+            path: /healthz
+          initialDelaySeconds: 5
+          periodSeconds: 67
+        resources:
+          requests:
+            cpu: 250m
+            memory: 500Mi

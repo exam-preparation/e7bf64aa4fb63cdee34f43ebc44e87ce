@@ -1,0 +1,24 @@
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: shortenurl-${CI_COMMIT_REF_SLUG}
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: shortenurl-${CI_COMMIT_REF_SLUG}
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Object
+    object:
+      metric:
+        name: requests-per-second
+      describedObject:
+        apiVersion: networking.k8s.io/v1beta1
+        kind: Ingress
+        name: shortenurl-${CI_COMMIT_REF_SLUG}
+      target:
+        type: Value
+        value: 1k
